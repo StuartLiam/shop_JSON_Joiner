@@ -48,7 +48,7 @@ def inner_join(dict_one,value_one,dict_two,value_two):
 
     d = d + "]"
     d = d.replace("}{","},{")
-    d = json.loads(d)
+    d = d.replace("'","/""")
     return d#print(d)
 
 # #outer join
@@ -80,14 +80,14 @@ def outer_join(dict_one,value_one,dict_two,value_two):
 
         if((one is not None and two is not None) and one.get(value_one) < two.get(value_two)):
             build_item.update(two)
-            build_item.update({k : None for k in build_item.keys()})
+            build_item.update({k : "None" for k in build_item.keys()})
             build_item.update(one)
             d = d + json.dumps(build_item)
             one = next(one_ittr,None)
 
         if((one is not None and two is not None) and one.get(value_one) > two.get(value_two)):
             build_item.update(one) 
-            build_item.update({k : None for k in build_item.keys()})
+            build_item.update({k : "None" for k in build_item.keys()})
             build_item.update(two)
             d = d + json.dumps(build_item)
             two = next(two_ittr,None)
@@ -96,7 +96,7 @@ def outer_join(dict_one,value_one,dict_two,value_two):
 
     d = d + "]"
     d = d.replace("}{","},{")
-    d = json.loads(d)
+    d = d.replace("'","/""")
     return d #print(d)
 
 print(inner_join(customers_dict,"cid",orders_dict,"customer_id"))
