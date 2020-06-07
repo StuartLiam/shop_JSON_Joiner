@@ -33,10 +33,10 @@ def inner_join(dict_one,value_one,dict_two,value_two):
             break
 
         if((one is not None and two is not None) and one.get(value_one) is two.get(value_two)):
-            two = next(two_ittr,None)
             build_item.update(two)
             build_item.update(one)
             d = d + json.dumps(build_item)
+            two = next(two_ittr,None)
 
         if((one is not None and two is not None) and one.get(value_one) < two.get(value_two)):
             one = next(one_ittr,None)
@@ -64,6 +64,9 @@ def outer_join(dict_one,value_one,dict_two,value_two):
     one = next(one_ittr,None)
     two = next(two_ittr,None)
 
+    prev_one = None
+    prev_two = None
+
     d = "["
 
     while (one is not None and two is not None):
@@ -73,24 +76,47 @@ def outer_join(dict_one,value_one,dict_two,value_two):
             break
 
         if((one is not None and two is not None) and one.get(value_one) is two.get(value_two)):
-            two = next(two_ittr,None)
             build_item.update(two)
             build_item.update(one)
             d = d + json.dumps(build_item)
+            prev_two = two
+            two = next(two_ittr,None)
 
         if((one is not None and two is not None) and one.get(value_one) < two.get(value_two)):
-            build_item.update(two)
-            build_item.update({k : "None" for k in build_item.keys()})
-            build_item.update(one)
-            d = d + json.dumps(build_item)
+            if((one is not None and prev_two is not None) and one.get(value_one) is not prev_two.get(value_two)):
+                build_item.update(two)
+                build_item.update({k : "None" for k in build_item.keys()})
+                build_item.update(one)
+                d = d + json.dumps(build_item)
+            prev_one = one
             one = next(one_ittr,None)
 
         if((one is not None and two is not None) and one.get(value_one) > two.get(value_two)):
-            build_item.update(one) 
-            build_item.update({k : "None" for k in build_item.keys()})
-            build_item.update(two)
-            d = d + json.dumps(build_item)
+            if((prev_one is not None and two is not None) and prev_one.get(value_one) is not two.get(value_two)):
+                build_item.update(one) 
+                build_item.update({k : "None" for k in build_item.keys()})
+                build_item.update(two)
+                d = d + json.dumps(build_item)
+            prev_two = two
             two = next(two_ittr,None)
+
+        if(one is None and two is not None):
+            if((prev_one is not None and two is not None) and prev_one.get(value_one) is not two.get(value_two)):
+                build_item.update(prev_one) 
+                build_item.update({k : "None" for k in build_item.keys()})
+                build_item.update(two)
+                d = d + json.dumps(build_item)
+            prev_two = two
+            two = next(two_ittr,None)
+
+        if(one is not None and two_sorted is None):
+            if((one is not None and prev_two is not None) and one.get(value_one) is not prev_two.get(value_two)):
+                build_item.update(prev_two)
+                build_item.update({k : "None" for k in build_item.keys()})
+                build_item.update(one)
+                d = d + json.dumps(build_item)
+            prev_one = one
+            one = next(one_ittr,None)
 
 
 
